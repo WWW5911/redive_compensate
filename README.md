@@ -1,1 +1,1 @@
-# redive_compensate
+# 補償刀計算機
