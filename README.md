@@ -9,3 +9,4 @@ https://redive.astriaworks.moe/
 - footer 做成可以關閉的
 - auto 格式化
 - 關鍵角色格式化 (?
+- 默認時間軸是依序的，時間歸零後添加刪節線
