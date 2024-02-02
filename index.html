@@ -71,12 +71,17 @@
             text-align: left;
             background-color: #f8f9fad0; /* 底部背景顏色 */
             padding-top: 10px;
-            position: absolute;
+            position: fixed;
             bottom: 0;
             width: 100%;
             color: #b5786797;
         }
-
+        .closeBtn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -104,14 +109,18 @@
     </div>
     
     <div class="footer">
-        &nbsp&nbsp&nbsp本網站為靜態網站，不回傳任何資訊到後端，網站作者：Astria https://www.astriaworks.moe/；contact@astriaworks.moe。
+        <span id="closeFooterBtn" class="closeBtn">×</span>
+        &nbsp;&nbsp;&nbsp;本網站為靜態網站，不回傳任何資訊到後端，網站作者：Astria 「https://github.com/WWW5911」、「https://www.astriaworks.moe/」；contact@astriaworks.moe。
         <br>
-        &nbsp&nbsp&nbsp背景來源：URL：http://loo.sakura.ne.jp/index.html；サイト名：空彩；管理人：ツジキ
+        &nbsp;&nbsp;&nbsp;背景來源：URL：http://loo.sakura.ne.jp/index.html；サイト名：空彩；管理人：ツジキ
     </div>
     <script src="js/calculater.js"></script>
     <script>
     check();
     document.getElementById('output').innerHTML = "請在左邊輸入軸><";
+    document.getElementById('closeFooterBtn').addEventListener('click', function() {
+        document.querySelector('.footer').style.display = 'none';
+    });
     </script>
 </body>
 </html>
