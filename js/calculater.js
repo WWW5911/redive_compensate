@@ -115,13 +115,13 @@ function compensateTran(text) {
     }
 
     if (flag === -1) {
-        console.log(text, "><")
+//        console.log(text, "><")
         if(text.length != 0){
             return ret_str.substring(0, leng) + compensateTran(text.substring(leng))
         }
         return ret_str;
     }
-    console.log(text, flag)
+//    console.log(text, flag)
     var time = calculateTime(text, flag);
     if (time >= 0) {
         var min = String(parseInt(time / 60));
