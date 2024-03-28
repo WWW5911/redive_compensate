@@ -43,7 +43,7 @@ var regex2 = /^\d{1}:\d{2}$/;
 var regex2_5 = /^\d{1}：\d{2}$/; 
 var regex3 = /^\d{2}$/; 
 
-function compensateTran(text){
+function compensateTran_Head(text){
     var timeStr = text.substring(0, 4);
     var ret_str = text;
     var flag = -1;
@@ -61,37 +61,110 @@ function compensateTran(text){
      //   console.log("字符串只符合 '数字数字' 的格式");
         time = parseInt(timeStr.substring(0, 2) ) - timePass ;
         flag = 3;
-    }else {
-    //    console.log("字符串不符合要求的格式");
-    //    if(startFlag) ret_str = "";
+    }
+    return flag;
+    // else {
+    // //    console.log("字符串不符合要求的格式");
+    // //    if(startFlag) ret_str = "";
+    //     return ret_str;
+    // }
+    
+    
+    // if (time >= 0){
+    //     var min = String(parseInt(time / 60));
+    //     var sec = time % 60;
+    // }else{
+    //     var min = "0";
+    //     var sec = "0";
+    // }
+
+    // if(sec < 10) sec = "0" + sec;
+    // else sec = String(sec);
+    // if(flag == 1){
+    //     ret_str = min + sec + text.substring(3, text.length);
+    // }
+    // else if (flag == 2){
+    //     ret_str = min + colon +  sec + text.substring(4, text.length);
+    // }else if (flag == 3){
+    //     ret_str = "0" + sec + text.substring(2, text.length);
+    // }
+
+    // // if( !startFlag) ret_str =  "\n ==== 以下是時間軸 ====\n" + ret_str;
+    // startFlag = true;
+    
+    // return ret_str
+}
+function compensateTran(text) {
+    var ret_str = text;
+    var flag = -1;
+    var colon = ":";
+    var leng = 1;
+
+    if (regex1.test(text.substring(0, 4)) ) {
+        flag = 1;
+        leng = 4;
+    }else if (regex1.test(text.substring(0, 3))){
+        flag = 1;
+        leng = 3;
+    }else if (regex2.test(text.substring(0, 4)) || regex2_5.test(text.substring(0, 4))) {
+        flag = 2;
+        leng = 4;
+    } else if (regex3.test(text.substring(0, 2))) {
+        flag = 3;
+        leng = 2;
+    }
+
+    if (flag === -1) {
+        console.log(text, "><")
+        if(text.length != 0){
+            return ret_str.substring(0, leng) + compensateTran(text.substring(leng))
+        }
         return ret_str;
     }
-    
-    
-    if (time >= 0){
+    console.log(text, flag)
+    var time = calculateTime(text, flag);
+    if (time >= 0) {
         var min = String(parseInt(time / 60));
         var sec = time % 60;
-    }else{
+    } else {
         var min = "0";
         var sec = "0";
     }
 
-    if(sec < 10) sec = "0" + sec;
-    else sec = String(sec);
-    if(flag == 1){
-        ret_str = min + sec + text.substring(3, text.length);
-    }
-    else if (flag == 2){
-        ret_str = min + colon +  sec + text.substring(4, text.length);
-    }else if (flag == 3){
-        ret_str = "0" + sec + text.substring(2, text.length);
+    if (sec < 10) {
+        sec = "0" + sec;
+    } else {
+        sec = String(sec);
     }
 
-    // if( !startFlag) ret_str =  "\n ==== 以下是時間軸 ====\n" + ret_str;
-    startFlag = true;
+    if (flag === 1) {
+        ret_str = min + sec 
+    } else if (flag === 2) {
+        colon = text.includes(":") ? ":" : "：";
+        ret_str = min + colon + sec 
+    } else if (flag === 3) {
+        ret_str = "0" + sec 
+    }
     
-    return ret_str
+    ret_str += compensateTran(text.substring(leng))
+
+    return ret_str;
 }
+
+function calculateTime(text, flag) {
+    var timeStr = text.substring(0, flag === 3 ? 2 : 4);
+    var time = 0;
+    if (flag === 1) {
+        time = timeTran2(timeStr) - timePass;
+    } else if (flag === 2) {
+        time = timeTran1(timeStr) - timePass;
+    } else if (flag === 3) {
+        time = parseInt(timeStr) - timePass;
+    }
+    return time;
+}
+
+
 var startFlag = false;
 function compensate(text){
     if(text.length == 0){
@@ -99,14 +172,25 @@ function compensate(text){
     }else{
         if(timePass <= 90 && timePass >= 0){
             lines = text.split("\n");
+            headText = ""
             new_text = ""
             startFlag = false;
-
+            flag = 0;
             for(var i = 0; i < lines.length; ++i){
-                new_text += compensateTran(lines[i]) + "\n";
+                if(compensateTran_Head(lines[i]) != -1 || flag == 1){
+                    new_text += compensateTran(lines[i]) + "\n";
+                    flag = 1;
+                }
+                else{
+                    headText += lines[i] + "\n";
+                }
             }
-            var regex = /^(\d{1,}：\d{2}|\d{1,}:\d{2}|\d{1,3}\d{2,3})\b/gm;  // 每行句首 匹配 "數字:數字數字" 或 "數字數字數字" 的模式
+        //    var regex = /^(\d{1,}：\d{2}|\d{1,}:\d{2}|\d{1,3}\d{2,3})\b/gm;  // 每行句首 匹配 "數字:數字數字" 或 "數字數字數字" 的模式
+            var regex =  /(\d{1,}:\d{2}|\d{1,3}\d{2,3}|\d{1,2}:\d{2})\b/gm;
             var formattedText = new_text.replace(regex, '<span style="color:red">$1</span>'); // 將符合模式的文字調整為紅色顯示
+            var regex2 = /(\d{2,3})/gm;
+            var formattedText = formattedText.replace(regex2, '<span style="color:red">$1</span>'); // 將符合模式的文字調整為紅色顯示
+            formattedText = headText + formattedText;
             document.getElementById('output').innerHTML = formattedText;
         }else{
             document.getElementById('timeFormat').innerHTML = '（分:秒秒 / 分秒秒 / 秒秒）'
