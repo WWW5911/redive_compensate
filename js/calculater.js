@@ -174,15 +174,24 @@ function compensate(text){
             lines = text.split("\n");
             headText = ""
             new_text = ""
+            late_text = ""
             startFlag = false;
             flag = 0;
             for(var i = 0; i < lines.length; ++i){
                 if(compensateTran_Head(lines[i]) != -1 || flag == 1){
-                    new_text += compensateTran(lines[i]) + "\n";
-                    flag = 1;
+                    tmp = compensateTran(lines[i]) + "\n";
+                    if(tmp.substring(0,4) != "0:00" && tmp.substring(0,4) != "0：00" && tmp.substring(0,3) != "000" ){
+                        new_text += tmp;
+                        flag = 1;
+                    }else{
+                        late_text += compensateTran(lines[i]) + "\n";
+                        flag = 2;
+                    }
                 }
-                else{
+                else if (flag == 0){
                     headText += lines[i] + "\n";
+                }else if (flag == 2){
+                    late_text += compensateTran(lines[i]) + "\n";
                 }
             }
         //    var regex = /^(\d{1,}：\d{2}|\d{1,}:\d{2}|\d{1,3}\d{2,3})\b/gm;  // 每行句首 匹配 "數字:數字數字" 或 "數字數字數字" 的模式
@@ -190,7 +199,7 @@ function compensate(text){
             var formattedText = new_text.replace(regex, '<span style="color:red">$1</span>'); // 將符合模式的文字調整為紅色顯示
             var regex2 = /(\d{2,3})/gm;
             var formattedText = formattedText.replace(regex2, '<span style="color:red">$1</span>'); // 將符合模式的文字調整為紅色顯示
-            formattedText = headText + formattedText;
+            formattedText = headText + formattedText + "<del>" + late_text + "</del>";
             document.getElementById('output').innerHTML = formattedText;
         }else{
             document.getElementById('timeFormat').innerHTML = '（分:秒秒 / 分秒秒 / 秒秒）'
