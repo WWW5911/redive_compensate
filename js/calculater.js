@@ -48,7 +48,7 @@ function compensateTran(text){
     var ret_str = text;
     var flag = -1;
     var colon = ":";
-    if (regex1.test(timeStr)) {
+    if (regex1.test(timeStr) || regex1.test(timeStr.substring(0, 3)) ) {
     //    console.log("字符串符合 '数字数字数字' 的格式");
         time = timeTran2(timeStr) - timePass;
         flag = 1;
